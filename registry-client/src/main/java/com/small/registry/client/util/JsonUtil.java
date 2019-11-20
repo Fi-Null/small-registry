@@ -33,7 +33,7 @@ public class JsonUtil {
      * parse json to map
      *
      * @param json
-     * @return      only for filed type "null、ArrayList、LinkedHashMap、String、Long、Double、..."
+     * @return only for filed type "null、ArrayList、LinkedHashMap、String、Long、Double、..."
      */
     public static Map<String, Object> parseMap(String json) {
         return jsonReader.parseMap(json);
@@ -95,14 +95,12 @@ public class JsonUtil {
             }
             try {
                 return Long.valueOf(json);
-            }
-            catch (NumberFormatException ex) {
+            } catch (NumberFormatException ex) {
                 // ignore
             }
             try {
                 return Double.valueOf(json);
-            }
-            catch (NumberFormatException ex) {
+            } catch (NumberFormatException ex) {
                 // ignore
             }
             return json;
@@ -122,7 +120,7 @@ public class JsonUtil {
 
         // append start
         private static String[] split(String toSplit, String delimiter) {
-            if (toSplit!=null && !toSplit.isEmpty() && delimiter!=null && !delimiter.isEmpty()) {
+            if (toSplit != null && !toSplit.isEmpty() && delimiter != null && !delimiter.isEmpty()) {
                 int offset = toSplit.indexOf(delimiter);
                 if (offset < 0) {
                     return null;
@@ -135,13 +133,14 @@ public class JsonUtil {
                 return null;
             }
         }
+
         private static String[] trimArrayElements(String[] array) {
             if (array == null || array.length == 0) {
                 return new String[0];
             } else {
                 String[] result = new String[array.length];
 
-                for(int i = 0; i < array.length; ++i) {
+                for (int i = 0; i < array.length; ++i) {
                     String element = array[i];
                     result[i] = element != null ? element.trim() : null;
                 }
@@ -186,11 +185,9 @@ public class JsonUtil {
                 if (current == ',' && inObject == 0 && inList == 0 && !inValue) {
                     list.add(build.toString());
                     build.setLength(0);
-                }
-                else if (current == '\\') {
+                } else if (current == '\\') {
                     inEscape = true;
-                }
-                else {
+                } else {
                     build.append(current);
                 }
                 index++;
@@ -282,13 +279,13 @@ public class JsonUtil {
                 // string
 
                 json.append(STR_SLASH).append(value.toString()).append(STR_SLASH);
-            } else if ( value instanceof Boolean
+            } else if (value instanceof Boolean
                     || value instanceof Short
                     || value instanceof Integer
                     || value instanceof Long
                     || value instanceof Float
                     || value instanceof Double
-            ) {
+                    ) {
                 // number
 
                 json.append(value);

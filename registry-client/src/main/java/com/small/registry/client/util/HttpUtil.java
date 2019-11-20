@@ -59,7 +59,7 @@ public class HttpUtil {
             // valid StatusCode
             int statusCode = connection.getResponseCode();
             if (statusCode != 200) {
-                throw new RuntimeException("http request StatusCode("+ statusCode +") invalid. for url : " + url);
+                throw new RuntimeException("http request StatusCode(" + statusCode + ") invalid. for url : " + url);
             }
 
             // result
@@ -111,7 +111,7 @@ public class HttpUtil {
             // valid StatusCode
             int statusCode = connection.getResponseCode();
             if (statusCode != 200) {
-                throw new RuntimeException("Http Request StatusCode("+ statusCode +") Invalid.");
+                throw new RuntimeException("Http Request StatusCode(" + statusCode + ") Invalid.");
             }
 
             // result
