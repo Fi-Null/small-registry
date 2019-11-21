@@ -11,28 +11,28 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 /**
- * @ClassName RegistryThread
+ * @ClassName RegistryWorker
  * @Description TODO
  * @Author xiangke
  * @Date 2019/11/20 23:30
  * @Version 1.0
  **/
-public class RegistryThread extends Thread {
-    private static Logger logger = LoggerFactory.getLogger(RegistryThread.class);
+public class RegistryWorker extends Thread {
+    private static Logger logger = LoggerFactory.getLogger(RegistryWorker.class);
 
     private RegistryClient registryClient;
 
-    public RegistryThread(RegistryClient registryClient) {
+    public RegistryWorker(RegistryClient registryClient) {
         this.registryClient = registryClient;
     }
 
     @Override
     public void run() {
-        boolean registryThreadStop = registryClient.isRegistryThreadStop();
+        boolean workerThreadStop = registryClient.isWorkerThreadStop();
         RegistryBaseClient registryBaseClient = registryClient.getRegistryBaseClient();
         Set<RegistryDataParamVO> registryData = registryClient.getRegistryData();
 
-        while (!registryClient.isRegistryThreadStop()) {
+        while (!workerThreadStop) {
             try {
                 if (registryClient.getRegistryData().size() > 0) {
 
@@ -40,14 +40,14 @@ public class RegistryThread extends Thread {
                     logger.debug(">>>>>>>>>>> small-registry, refresh registry data {}, registryData = {}", ret ? "success" : "fail", registryData);
                 }
             } catch (Exception e) {
-                if (!registryThreadStop) {
+                if (!workerThreadStop) {
                     logger.error(">>>>>>>>>>> small-registry, registryThread error.", e);
                 }
             }
             try {
                 TimeUnit.SECONDS.sleep(10);
             } catch (Exception e) {
-                if (!registryThreadStop) {
+                if (!workerThreadStop) {
                     logger.error(">>>>>>>>>>> small-registry, registryThread error.", e);
                 }
             }

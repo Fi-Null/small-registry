@@ -285,7 +285,7 @@ public class JsonUtil {
                     || value instanceof Long
                     || value instanceof Float
                     || value instanceof Double
-                    ) {
+            ) {
                 // number
 
                 json.append(value);

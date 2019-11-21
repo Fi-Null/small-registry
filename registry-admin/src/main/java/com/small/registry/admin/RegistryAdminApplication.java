@@ -1,4 +1,4 @@
-package com.small.registry;
+package com.small.registry.admin;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

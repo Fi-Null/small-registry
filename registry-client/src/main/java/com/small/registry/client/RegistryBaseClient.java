@@ -1,5 +1,6 @@
 package com.small.registry.client;
 
+import com.small.registry.client.config.Constant;
 import com.small.registry.client.model.RegistryDataParamVO;
 import com.small.registry.client.model.RegistryParamVO;
 import com.small.registry.client.util.HttpUtil;
@@ -60,21 +61,7 @@ public class RegistryBaseClient {
      */
     public boolean registry(List<RegistryDataParamVO> registryDataList) {
 
-        // valid
-        if (registryDataList == null || registryDataList.size() == 0) {
-            throw new RuntimeException("small-registry registryDataList empty");
-        }
-        for (RegistryDataParamVO registryParam : registryDataList) {
-            if (registryParam.getKey() == null || registryParam.getKey().trim().length() < 4 || registryParam.getKey().trim().length() > 255) {
-                throw new RuntimeException("small-registry registryDataList#key Invalid[4~255]");
-            }
-            if (registryParam.getValue() == null || registryParam.getValue().trim().length() < 4 || registryParam.getValue().trim().length() > 255) {
-                throw new RuntimeException("small-registry registryDataList#value Invalid[4~255]");
-            }
-        }
-
-        // pathUrl
-        String pathUrl = "/api/registry";
+        checkRegistryDataParam(registryDataList);
 
         // param
         RegistryParamVO registryParamVO = new RegistryParamVO();
@@ -86,7 +73,7 @@ public class RegistryBaseClient {
         String paramsJson = JsonUtil.toJson(registryParamVO);
 
         // result
-        Map<String, Object> respObj = requestRegistryServer(pathUrl, paramsJson, 5);
+        Map<String, Object> respObj = requestRegistryServer(Constant.REGISTRY_URL, paramsJson, 5);
         return respObj != null ? true : false;
     }
 
@@ -98,20 +85,7 @@ public class RegistryBaseClient {
      */
     public boolean remove(List<RegistryDataParamVO> registryDataList) {
         // valid
-        if (registryDataList == null || registryDataList.size() == 0) {
-            throw new RuntimeException("small-registry registryDataList empty");
-        }
-        for (RegistryDataParamVO registryParam : registryDataList) {
-            if (registryParam.getKey() == null || registryParam.getKey().trim().length() < 4 || registryParam.getKey().trim().length() > 255) {
-                throw new RuntimeException("small-registry registryDataList#key Invalid[4~255]");
-            }
-            if (registryParam.getValue() == null || registryParam.getValue().trim().length() < 4 || registryParam.getValue().trim().length() > 255) {
-                throw new RuntimeException("small-registry registryDataList#value Invalid[4~255]");
-            }
-        }
-
-        // pathUrl
-        String pathUrl = "/api/remove";
+        checkRegistryDataParam(registryDataList);
 
         // param
         RegistryParamVO registryParamVO = new RegistryParamVO();
@@ -123,7 +97,7 @@ public class RegistryBaseClient {
         String paramsJson = JsonUtil.toJson(registryParamVO);
 
         // result
-        Map<String, Object> respObj = requestRegistryServer(pathUrl, paramsJson, 5);
+        Map<String, Object> respObj = requestRegistryServer(Constant.REMOVE_URL, paramsJson, 5);
         return respObj != null ? true : false;
     }
 
@@ -139,9 +113,6 @@ public class RegistryBaseClient {
             throw new RuntimeException("small-registry keys empty");
         }
 
-        // pathUrl
-        String pathUrl = "/api/discovery";
-
         // param
         RegistryParamVO registryParamVO = new RegistryParamVO();
         registryParamVO.setAccessToken(this.accessToken);
@@ -152,7 +123,7 @@ public class RegistryBaseClient {
         String paramsJson = JsonUtil.toJson(registryParamVO);
 
         // result
-        Map<String, Object> respObj = requestRegistryServer(pathUrl, paramsJson, 5);
+        Map<String, Object> respObj = requestRegistryServer(Constant.DISCOVERY_URL, paramsJson, 5);
 
         // parse
         if (respObj != null && respObj.containsKey("data")) {
@@ -175,9 +146,6 @@ public class RegistryBaseClient {
             throw new RuntimeException("small-registry keys empty");
         }
 
-        // pathUrl
-        String pathUrl = "/api/monitor";
-
         // param
         RegistryParamVO registryParamVO = new RegistryParamVO();
         registryParamVO.setAccessToken(this.accessToken);
@@ -188,7 +156,7 @@ public class RegistryBaseClient {
         String paramsJson = JsonUtil.toJson(registryParamVO);
 
         // result
-        Map<String, Object> respObj = requestRegistryServer(pathUrl, paramsJson, 60);
+        Map<String, Object> respObj = requestRegistryServer(Constant.MONITOR_URL, paramsJson, 60);
         return respObj != null ? true : false;
     }
 
@@ -217,7 +185,7 @@ public class RegistryBaseClient {
             if (resopnseMap == null
                     || !resopnseMap.containsKey("code")
                     || !"200".equals(String.valueOf(resopnseMap.get("code")))
-                    ) {
+            ) {
                 logger.warn("RegistryBaseClient response fail, responseData={}", responseData);
                 return null;
             }
@@ -227,6 +195,21 @@ public class RegistryBaseClient {
 
 
         return null;
+    }
+
+    private void checkRegistryDataParam(List<RegistryDataParamVO> registryDataList) {
+        // valid
+        if (registryDataList == null || registryDataList.size() == 0) {
+            throw new RuntimeException("small-registry registryDataList empty");
+        }
+        for (RegistryDataParamVO registryParam : registryDataList) {
+            if (registryParam.getKey() == null || registryParam.getKey().trim().length() < 4 || registryParam.getKey().trim().length() > 255) {
+                throw new RuntimeException("small-registry registryDataList#key Invalid[4~255]");
+            }
+            if (registryParam.getValue() == null || registryParam.getValue().trim().length() < 4 || registryParam.getValue().trim().length() > 255) {
+                throw new RuntimeException("small-registry registryDataList#value Invalid[4~255]");
+            }
+        }
     }
 
 }

@@ -2,8 +2,8 @@ package com.small.registry.client;
 
 import com.small.registry.client.model.RegistryDataParamVO;
 import com.small.registry.client.util.JsonUtil;
-import com.small.registry.client.worker.DiscoveryThread;
-import com.small.registry.client.worker.RegistryThread;
+import com.small.registry.client.worker.DiscoveryWorker;
+import com.small.registry.client.worker.RegistryWorker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,23 +27,23 @@ public class RegistryClient {
 
     private Thread registryThread;
     private Thread discoveryThread;
-    private volatile boolean registryThreadStop = false;
-
+    private volatile boolean workerThreadStop = false;
 
     private RegistryBaseClient registryBaseClient;
 
     public RegistryClient(String adminAddress, String accessToken, String biz, String env) {
         registryBaseClient = new RegistryBaseClient(adminAddress, accessToken, biz, env);
+
         logger.info(">>>>>>>>>>> small-registry, RegistryClient init .... [adminAddress={}, accessToken={}, biz={}, env={}]", adminAddress, accessToken, biz, env);
 
         // registry thread
-        registryThread = new RegistryThread(this);
+        registryThread = new RegistryWorker(this);
         registryThread.setName("small-registry, RegistryClient registryThread.");
         registryThread.setDaemon(true);
         registryThread.start();
 
         // discovery thread
-        discoveryThread = new DiscoveryThread(this);
+        discoveryThread = new DiscoveryWorker(this);
         discoveryThread.setName("small-registry, RegistryClient discoveryThread.");
         discoveryThread.setDaemon(true);
         discoveryThread.start();
@@ -53,7 +53,7 @@ public class RegistryClient {
 
 
     public void stop() {
-        registryThreadStop = true;
+        workerThreadStop = true;
         if (registryThread != null) {
             registryThread.interrupt();
         }
@@ -69,20 +69,6 @@ public class RegistryClient {
      * @return
      */
     public boolean registry(List<RegistryDataParamVO> registryDataList) {
-
-        // valid
-        if (registryDataList == null || registryDataList.size() == 0) {
-            throw new RuntimeException("small-registry registryDataList empty");
-        }
-        for (RegistryDataParamVO registryParam : registryDataList) {
-            if (registryParam.getKey() == null || registryParam.getKey().trim().length() < 4 || registryParam.getKey().trim().length() > 255) {
-                throw new RuntimeException("small-registry registryDataList#key Invalid[4~255]");
-            }
-            if (registryParam.getValue() == null || registryParam.getValue().trim().length() < 4 || registryParam.getValue().trim().length() > 255) {
-                throw new RuntimeException("small-registry registryDataList#value Invalid[4~255]");
-            }
-        }
-
         // cache
         registryData.addAll(registryDataList);
 
@@ -100,19 +86,6 @@ public class RegistryClient {
      * @return
      */
     public boolean remove(List<RegistryDataParamVO> registryDataList) {
-        // valid
-        if (registryDataList == null || registryDataList.size() == 0) {
-            throw new RuntimeException("small-registry registryDataList empty");
-        }
-        for (RegistryDataParamVO registryParam : registryDataList) {
-            if (registryParam.getKey() == null || registryParam.getKey().trim().length() < 4 || registryParam.getKey().trim().length() > 255) {
-                throw new RuntimeException("small-registry registryDataList#key Invalid[4~255]");
-            }
-            if (registryParam.getValue() == null || registryParam.getValue().trim().length() < 4 || registryParam.getValue().trim().length() > 255) {
-                throw new RuntimeException("small-registry registryDataList#value Invalid[4~255]");
-            }
-        }
-
         // cache
         registryData.removeAll(registryDataList);
 
@@ -233,12 +206,12 @@ public class RegistryClient {
         this.discoveryData = discoveryData;
     }
 
-    public boolean isRegistryThreadStop() {
-        return registryThreadStop;
+    public boolean isWorkerThreadStop() {
+        return workerThreadStop;
     }
 
-    public void setRegistryThreadStop(boolean registryThreadStop) {
-        this.registryThreadStop = registryThreadStop;
+    public void setWorkerThreadStop(boolean workerThreadStop) {
+        this.workerThreadStop = workerThreadStop;
     }
 
     public RegistryBaseClient getRegistryBaseClient() {

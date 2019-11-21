@@ -13,7 +13,7 @@
     <artifactId>registry-admin</artifactId>
     <version>1.0.-SNAPSHOT</version>
     <name>registry-admin</name>
-    <description>Demo project for Spring Boot</description>
+    <description>registry-admin</description>
 
     <properties>
         <java.version>1.8</java.version>
