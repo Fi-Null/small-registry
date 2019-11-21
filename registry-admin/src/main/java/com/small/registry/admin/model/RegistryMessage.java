@@ -6,7 +6,7 @@ import java.util.Date;
  * @author null
  * @version 1.0
  * @title
- * @description
+ * @description 存储最新10s的数据
  * @createDate 11/21/19 2:46 PM
  */
 public class RegistryMessage {

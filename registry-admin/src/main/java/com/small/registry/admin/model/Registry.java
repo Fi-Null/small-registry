@@ -6,7 +6,7 @@ import java.util.List;
  * @author null
  * @version 1.0
  * @title
- * @description
+ * @description 存储全量数据
  * @createDate 11/21/19 2:42 PM
  */
 public class Registry {

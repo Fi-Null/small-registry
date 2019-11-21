@@ -6,7 +6,7 @@ import java.util.Date;
  * @author null
  * @version 1.0
  * @title
- * @description
+ * @description 存储最近30s数据
  * @createDate 11/21/19 2:45 PM
  */
 public class RegistryData {

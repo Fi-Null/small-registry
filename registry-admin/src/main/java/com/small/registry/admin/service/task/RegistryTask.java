@@ -252,10 +252,10 @@ public class RegistryTask implements InitializingBean, DisposableBean {
                                 registryItem.setData(dataJson);
                             } else {
                                 // default, sync from db
-                                List<RegistryData> RegistryDataList = registryDataDao.findData(registryItem.getBiz(), registryItem.getEnv(), registryItem.getKey());
+                                List<RegistryData> registryDataList = registryDataDao.findData(registryItem.getBiz(), registryItem.getEnv(), registryItem.getKey());
                                 List<String> valueList = new ArrayList<>();
-                                if (RegistryDataList != null && RegistryDataList.size() > 0) {
-                                    for (RegistryData dataItem : RegistryDataList) {
+                                if (registryDataList != null && registryDataList.size() > 0) {
+                                    for (RegistryData dataItem : registryDataList) {
                                         valueList.add(dataItem.getValue());
                                     }
                                 }

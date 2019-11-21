@@ -188,22 +188,6 @@ public class RegistryServiceImpl implements RegistryService {
         return deferredResult;
     }
 
-    // set
-    public String setFileRegistryData(Registry registry) {
-        String fileName = FileUtil.setFileRegistryData(registryDataFilePath, registry);
-
-        // brocast monitor client
-        List<DeferredResult> deferredResultList = RegistryTask.getRegistryDeferredResultMap().get(fileName);
-        if (deferredResultList != null) {
-            RegistryTask.getRegistryDeferredResultMap().remove(fileName);
-            for (DeferredResult deferredResult : deferredResultList) {
-                deferredResult.setResult(new Response<>(Response.SUCCESS_CODE, "Monitor key update."));
-            }
-        }
-
-        return new File(fileName).getPath();
-    }
-
     private Response checkParam(String accessToken, String biz, String env, List<RegistryData> registryDataList) {
         // valid
         if (this.accessToken != null && this.accessToken.trim().length() > 0 && !this.accessToken.equals(accessToken)) {
