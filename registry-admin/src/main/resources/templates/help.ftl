@@ -5,7 +5,7 @@
   	<title>分布式服务注册中心</title>
 	<@netCommon.commonStyle />
 </head>
-<body class="hold-transition skin-blue sidebar-mini <#if cookieMap?exists && cookieMap["xxlregistry_adminlte_settings"]?exists && "off" == cookieMap["xxlregistry_adminlte_settings"].value >sidebar-collapse</#if> ">
+<body class="hold-transition skin-blue sidebar-mini <#if cookieMap?exists && cookieMap["registry_adminlte_settings"]?exists && "off" == cookieMap["xxlregistry_adminlte_settings"].value >sidebar-collapse</#if> ">
 <div class="wrapper">
 	<!-- header -->
 	<@netCommon.commonHeader />
