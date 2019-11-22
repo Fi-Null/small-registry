@@ -21,9 +21,9 @@ public interface RegistryService {
 
     Response<String> delete(Long id);
 
-    Response<String> update(Registry xxlRegistry);
+    Response<String> update(Registry registry);
 
-    Response<String> add(Registry xxlRegistry);
+    Response<String> add(Registry registry);
 
 
     // ------------------------ remote registry ------------------------
