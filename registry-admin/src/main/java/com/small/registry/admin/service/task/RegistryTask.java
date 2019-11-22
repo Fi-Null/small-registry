@@ -167,7 +167,7 @@ public class RegistryTask implements InitializingBean, DisposableBean {
                         for (RegistryMessage message : messageList) {
                             readedMessageIds.add(message.getId());
 
-                            if (message.getType() == 0) {   // from registry、add、update、deelete，ne need sync from db, only write
+                            if (message.getType() == 0) {   // from registry、add、update、delete， need sync from db, only write
 
                                 Registry registry = JsonUtil.readValue(message.getData(), Registry.class);
 
@@ -217,7 +217,7 @@ public class RegistryTask implements InitializingBean, DisposableBean {
         executorService.execute(() -> {
             while (!executorStoped) {
 
-                // align to beattime
+                // align to registryBeatTime
                 try {
                     long sleepSecond = registryBeatTime - (System.currentTimeMillis() / 1000) % registryBeatTime;
                     if (sleepSecond > 0 && sleepSecond < registryBeatTime) {

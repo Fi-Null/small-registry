@@ -25,12 +25,12 @@ public interface RegistryDao {
                          @Param("env") String env,
                          @Param("key") String key);
 
-    public Registry loadById(@Param("id") int id);
+    public Registry loadById(@Param("id") Long id);
 
-    public int add(@Param("xxlRegistry") Registry registry);
+    public int add(@Param("registry") Registry registry);
 
-    public int update(@Param("xxlRegistry") Registry registry);
+    public int update(@Param("registry") Registry registry);
 
-    public int delete(@Param("id") int id);
+    public int delete(@Param("id") Long id);
 
 }

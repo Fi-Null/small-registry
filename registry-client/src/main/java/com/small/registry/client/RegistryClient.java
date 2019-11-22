@@ -36,13 +36,13 @@ public class RegistryClient {
 
         logger.info(">>>>>>>>>>> small-registry, RegistryClient init .... [adminAddress={}, accessToken={}, biz={}, env={}]", adminAddress, accessToken, biz, env);
 
-        // registry thread
+        // registry thread（register every 10s）
         registryThread = new RegistryWorker(this);
         registryThread.setName("small-registry, RegistryClient registryThread.");
         registryThread.setDaemon(true);
         registryThread.start();
 
-        // discovery thread
+        // discovery thread（discovery every 30s）
         discoveryThread = new DiscoveryWorker(this);
         discoveryThread.setName("small-registry, RegistryClient discoveryThread.");
         discoveryThread.setDaemon(true);

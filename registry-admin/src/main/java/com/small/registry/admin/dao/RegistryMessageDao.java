@@ -16,7 +16,7 @@ import java.util.List;
 @Mapper
 public interface RegistryMessageDao {
 
-    public int add(@Param("xxlRegistryMessage") RegistryMessage registryMessage);
+    public int add(@Param("registryMessage") RegistryMessage registryMessage);
 
     public List<RegistryMessage> findMessage(@Param("excludeIds") List<Long> excludeIds);
 

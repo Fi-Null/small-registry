@@ -9,9 +9,9 @@ import java.util.List;
 @Mapper
 public interface RegistryDataDao {
 
-    public int refresh(@Param("xxlRegistryData") RegistryData registryData);
+    public int refresh(@Param("registryData") RegistryData registryData);
 
-    public int add(@Param("xxlRegistryData") RegistryData registryData);
+    public int add(@Param("registryData") RegistryData registryData);
 
 
     public List<RegistryData> findData(@Param("biz") String biz,

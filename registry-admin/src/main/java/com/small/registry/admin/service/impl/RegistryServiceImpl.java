@@ -1,17 +1,23 @@
 package com.small.registry.admin.service.impl;
 
 import com.small.registry.admin.Response;
+import com.small.registry.admin.dao.RegistryDao;
+import com.small.registry.admin.dao.RegistryDataDao;
+import com.small.registry.admin.dao.RegistryMessageDao;
 import com.small.registry.admin.model.Registry;
 import com.small.registry.admin.model.RegistryData;
+import com.small.registry.admin.model.RegistryMessage;
 import com.small.registry.admin.service.RegistryService;
 import com.small.registry.admin.service.task.RegistryTask;
 import com.small.registry.admin.util.FileUtil;
+import com.small.registry.admin.util.JsonUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.async.DeferredResult;
 
+import javax.annotation.Resource;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -34,24 +40,126 @@ public class RegistryServiceImpl implements RegistryService {
     @Value("${small.registry.accessToken}")
     private String accessToken;
 
+    @Resource
+    private RegistryDao registryDao;
+    @Resource
+    private RegistryDataDao registryDataDao;
+    @Resource
+    private RegistryMessageDao registryMessageDao;
+
     @Override
     public Map<String, Object> pageList(int start, int length, String biz, String env, String key) {
-        return null;
+        // page list
+        List<Registry> list = registryDao.pageList(start, length, biz, env, key);
+        int list_count = registryDao.pageListCount(start, length, biz, env, key);
+
+        // package result
+        Map<String, Object> maps = new HashMap<>();
+        maps.put("recordsTotal", list_count);        // 总记录数
+        maps.put("recordsFiltered", list_count);    // 过滤后的总记录数
+        maps.put("data", list);                    // 分页列表
+        return maps;
     }
 
     @Override
-    public Response<String> delete(int id) {
-        return null;
+    public Response<String> delete(Long id) {
+        Registry registry = registryDao.loadById(id);
+        if (registry != null) {
+            registryDao.delete(id);
+            registryDataDao.deleteData(registry.getBiz(), registry.getEnv(), registry.getKey());
+
+            // sendRegistryDataUpdateMessage (delete)
+            registry.setData("");
+            sendRegistryDataUpdateMessage(registry);
+        }
+
+        return Response.SUCCESS;
+    }
+
+    private void sendRegistryDataUpdateMessage(Registry registry) {
+        String registryUpdateJson = JsonUtil.toJson(registry);
+
+        RegistryMessage registryMessage = new RegistryMessage();
+        registryMessage.setType(0);
+        registryMessage.setData(registryUpdateJson);
+        registryMessageDao.add(registryMessage);
     }
 
     @Override
-    public Response<String> update(Registry Registry) {
-        return null;
+    public Response<String> update(Registry registry) {
+        // valid
+        if (registry.getBiz() == null || registry.getBiz().trim().length() < 4 || registry.getBiz().trim().length() > 255) {
+            return new Response<String>(Response.FAIL_CODE, "业务线格式非法[4~255]");
+        }
+        if (registry.getEnv() == null || registry.getEnv().trim().length() < 2 || registry.getEnv().trim().length() > 255) {
+            return new Response<String>(Response.FAIL_CODE, "环境格式非法[2~255]");
+        }
+        if (registry.getKey() == null || registry.getKey().trim().length() < 4 || registry.getKey().trim().length() > 255) {
+            return new Response<String>(Response.FAIL_CODE, "注册Key格式非法[4~255]");
+        }
+        if (registry.getData() == null || registry.getData().trim().length() == 0) {
+            registry.setData(JsonUtil.toJson(new ArrayList<String>()));
+        }
+        List<String> valueList = JsonUtil.readValue(registry.getData(), List.class);
+        if (valueList == null) {
+            return new Response<String>(Response.FAIL_CODE, "注册Value数据格式非法；限制为字符串数组JSON格式，如 [address,address2]");
+        }
+
+        // valid exist
+        Registry exist = registryDao.loadById(registry.getId());
+        if (exist == null) {
+            return new Response<String>(Response.FAIL_CODE, "ID参数非法");
+        }
+
+        // if refresh
+        boolean needMessage = !registry.getData().equals(exist.getData());
+
+        int ret = registryDao.update(registry);
+        needMessage = ret > 0 ? needMessage : false;
+
+        if (needMessage) {
+            // sendRegistryDataUpdateMessage (update)
+            sendRegistryDataUpdateMessage(registry);
+        }
+
+        return ret > 0 ? Response.SUCCESS : Response.FAIL;
     }
 
     @Override
-    public Response<String> add(Registry Registry) {
-        return null;
+    public Response<String> add(Registry registry) {
+        // valid
+        if (registry.getBiz() == null || registry.getBiz().trim().length() < 4 || registry.getBiz().trim().length() > 255) {
+            return new Response<String>(Response.FAIL_CODE, "业务线格式非法[4~255]");
+        }
+        if (registry.getEnv() == null || registry.getEnv().trim().length() < 2 || registry.getEnv().trim().length() > 255) {
+            return new Response<String>(Response.FAIL_CODE, "环境格式非法[2~255]");
+        }
+        if (registry.getKey() == null || registry.getKey().trim().length() < 4 || registry.getKey().trim().length() > 255) {
+            return new Response<String>(Response.FAIL_CODE, "注册Key格式非法[4~255]");
+        }
+        if (registry.getData() == null || registry.getData().trim().length() == 0) {
+            registry.setData(JsonUtil.toJson(new ArrayList<String>()));
+        }
+        List<String> valueList = JsonUtil.readValue(registry.getData(), List.class);
+        if (valueList == null) {
+            return new Response<String>(Response.FAIL_CODE, "注册Value数据格式非法；限制为字符串数组JSON格式，如 [address,address2]");
+        }
+
+        // valid exist
+        Registry exist = registryDao.load(registry.getBiz(), registry.getEnv(), registry.getKey());
+        if (exist != null) {
+            return new Response<String>(Response.FAIL_CODE, "注册Key请勿重复");
+        }
+
+        int ret = registryDao.add(registry);
+        boolean needMessage = ret > 0 ? true : false;
+
+        if (needMessage) {
+            // sendRegistryDataUpdateMessage (add)
+            sendRegistryDataUpdateMessage(registry);
+        }
+
+        return ret > 0 ? Response.SUCCESS : Response.FAIL;
     }
 
     @Override

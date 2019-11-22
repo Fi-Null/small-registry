@@ -19,7 +19,7 @@ public interface RegistryService {
     // admin
     Map<String, Object> pageList(int start, int length, String biz, String env, String key);
 
-    Response<String> delete(int id);
+    Response<String> delete(Long id);
 
     Response<String> update(Registry xxlRegistry);
 
