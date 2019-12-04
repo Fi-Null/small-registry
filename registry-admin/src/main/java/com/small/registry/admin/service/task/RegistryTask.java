@@ -208,6 +208,7 @@ public class RegistryTask implements InitializingBean, DisposableBean {
         });
 
         /**
+         *  数据量很大的时候会出现问题
          *  clean old registry-data     (1/10s)
          *
          *  sync total registry-data db + file      (1+N/10s)
@@ -240,9 +241,7 @@ public class RegistryTask implements InitializingBean, DisposableBean {
 
                     List<Registry> registryList = registryDao.pageList(offset, pagesize, null, null, null);
                     while (registryList != null && registryList.size() > 0) {
-
                         for (Registry registryItem : registryList) {
-
                             // process data by status
                             if (registryItem.getStatus() == 1) {
                                 // locked, not updated
@@ -267,14 +266,12 @@ public class RegistryTask implements InitializingBean, DisposableBean {
                                     registryDao.update(registryItem);
                                 }
                             }
-
                             // sync file
                             String registryDataFile = setFileRegistryData(registryItem);
 
                             // collect registryDataFile
                             registryDataFileList.add(registryDataFile);
                         }
-
 
                         offset += 1000;
                         registryList = registryDao.pageList(offset, pagesize, null, null, null);

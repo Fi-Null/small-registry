@@ -70,7 +70,7 @@ public class FileUtil {
 
         PropUtil.writeProp(prop, fileName);
 
-        logger.info(">>>>>>>>>>> -registry, setFileRegistryData: biz={}, env={}, key={}, data={}"
+        logger.info(">>>>>>>>>>> small-registry, setFileRegistryData: biz={}, env={}, key={}, data={}"
                 , Registry.getBiz(), Registry.getEnv(), Registry.getKey(), Registry.getData());
 
         return fileName;
@@ -90,7 +90,7 @@ public class FileUtil {
             if (childFile.isFile() && !registryDataFileList.contains(childFile.getPath())) {
                 childFile.delete();
 
-                logger.info(">>>>>>>>>>> -registry, cleanFileRegistryData, RegistryData Path={}", childFile.getPath());
+                logger.info(">>>>>>>>>>> small-registry, cleanFileRegistryData, RegistryData Path={}", childFile.getPath());
             }
             if (childFile.isDirectory()) {
                 if (parentPath.listFiles() != null && parentPath.listFiles().length > 0) {
