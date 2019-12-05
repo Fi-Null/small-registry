@@ -43,7 +43,7 @@ public class DiscoveryWorker extends Thread {
                 }
             } else {
                 try {
-                    // monitor
+                    // monitor,await 30s[阻塞]
                     boolean monitorRet = registryBaseClient.monitor(discoveryData.keySet());
 
                     // avoid fail-retry request too quick

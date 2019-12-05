@@ -208,7 +208,7 @@ public class RegistryTask implements InitializingBean, DisposableBean {
         });
 
         /**
-         *  数据量很大的时候会出现问题
+         *
          *  clean old registry-data     (1/10s)
          *
          *  sync total registry-data db + file      (1+N/10s)
@@ -231,54 +231,59 @@ public class RegistryTask implements InitializingBean, DisposableBean {
                 }
 
                 try {
-                    // clean old registry-data in db
+                    // clean regitry data， save recently 30s regitry data
                     registryDataDao.cleanData(registryBeatTime * 3);
 
+
                     // sync registry-data, db + file
-                    int offset = 0;
-                    int pagesize = 1000;
-                    List<String> registryDataFileList = new ArrayList<>();
-
-                    List<Registry> registryList = registryDao.pageList(offset, pagesize, null, null, null);
-                    while (registryList != null && registryList.size() > 0) {
-                        for (Registry registryItem : registryList) {
-                            // process data by status
-                            if (registryItem.getStatus() == 1) {
-                                // locked, not updated
-                            } else if (registryItem.getStatus() == 2) {
-                                // disabled, write empty
-                                String dataJson = JsonUtil.toJson(new ArrayList<String>());
-                                registryItem.setData(dataJson);
-                            } else {
-                                // default, sync from db
-                                List<RegistryData> registryDataList = registryDataDao.findData(registryItem.getBiz(), registryItem.getEnv(), registryItem.getKey());
-                                List<String> valueList = new ArrayList<>();
-                                if (registryDataList != null && registryDataList.size() > 0) {
-                                    for (RegistryData dataItem : registryDataList) {
-                                        valueList.add(dataItem.getValue());
-                                    }
-                                }
-                                String dataJson = JsonUtil.toJson(valueList);
-
-                                // check update, sync db
-                                if (!registryItem.getData().equals(dataJson)) {
-                                    registryItem.setData(dataJson);
-                                    registryDao.update(registryItem);
-                                }
-                            }
-                            // sync file
-                            String registryDataFile = setFileRegistryData(registryItem);
-
-                            // collect registryDataFile
-                            registryDataFileList.add(registryDataFile);
-                        }
-
-                        offset += 1000;
-                        registryList = registryDao.pageList(offset, pagesize, null, null, null);
-                    }
+                    /**
+                     * TODO 数据量很大的时候会出现大的延时，获取整个registry表数据存在深分页风险
+                     * （后期考虑使用自增id遍历全部数据）
+                     */
+//                    int offset = 0;
+//                    int pagesize = 1000;
+//                    List<String> registryDataFileList = new ArrayList<>();
+//
+//                    List<Registry> registryList = registryDao.pageList(offset, pagesize, null, null, null);
+//                    while (registryList != null && registryList.size() > 0) {
+//                        for (Registry registryItem : registryList) {
+//                            // process data by status
+//                            if (registryItem.getStatus() == 1) {
+//                                // locked, not updated
+//                            } else if (registryItem.getStatus() == 2) {
+//                                // disabled, write empty
+//                                String dataJson = JsonUtil.toJson(new ArrayList<String>());
+//                                registryItem.setData(dataJson);
+//                            } else {
+//                                // default, sync from db
+//                                List<RegistryData> registryDataList = registryDataDao.findData(registryItem.getBiz(), registryItem.getEnv(), registryItem.getKey());
+//                                List<String> valueList = new ArrayList<>();
+//                                if (registryDataList != null && registryDataList.size() > 0) {
+//                                    for (RegistryData dataItem : registryDataList) {
+//                                        valueList.add(dataItem.getValue());
+//                                    }
+//                                }
+//                                String dataJson = JsonUtil.toJson(valueList);
+//
+//                                // check update, sync db
+//                                if (!registryItem.getData().equals(dataJson)) {
+//                                    registryItem.setData(dataJson);
+//                                    registryDao.update(registryItem);
+//                                }
+//                            }
+//                            // sync file
+//                            String registryDataFile = setFileRegistryData(registryItem);
+//
+//                            // collect registryDataFile
+//                            registryDataFileList.add(registryDataFile);
+//                        }
+//
+//                        offset += 1000;
+//                        registryList = registryDao.pageList(offset, pagesize, null, null, null);
+//                    }
 
                     // clean old registry-data file
-                    FileUtil.cleanFileRegistryData(registryDataFilePath, registryDataFileList);
+                   // FileUtil.cleanFileRegistryData(registryDataFilePath, registryDataFileList);
 
                 } catch (Exception e) {
                     if (!executorStoped) {

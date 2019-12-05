@@ -242,6 +242,8 @@ public class RegistryServiceImpl implements RegistryService {
      * setResult，如此以来这个请求不会占用服务连接池太久，如果超时或设置
      * setResult，接口会立即返回。
      *
+     * 优点就是可以实现两个完全不相干的线程间的通信
+     *
      * @param accessToken
      * @param biz
      * @param env
