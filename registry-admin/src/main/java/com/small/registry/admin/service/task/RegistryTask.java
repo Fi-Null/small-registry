@@ -237,8 +237,8 @@ public class RegistryTask implements InitializingBean, DisposableBean {
 
                     // sync registry-data, db + file
                     /**
-                     * TODO 数据量很大的时候会出现大的延时，获取整个registry表数据存在深分页风险
-                     * （后期考虑使用自增id遍历全部数据）
+                     * TODO 数据量很大的时候会出现大的延时，
+                     * 获取整个registry表数据存在深分页风险（后期考虑使用自增id遍历全部数据）
                      */
 //                    int offset = 0;
 //                    int pagesize = 1000;
